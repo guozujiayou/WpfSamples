@@ -1,0 +1,88 @@
+﻿<UserControl x:Class="WpfPrismDemo.Views.ScpView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WpfPrismDemo.Views"
+             mc:Ignorable="d"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:enumDto="clr-namespace:WpfPrismDemo.EnumDto"
+             xmlns:converts="clr-namespace:WpfPrismDemo.Converters"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <converts:ProductCodeToBooleanConverter x:Key="productToBoolean"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <StackPanel Margin="10">
+            <WrapPanel>
+                <TextBlock Text="本地路径" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                <TextBox Text="{Binding LocalPath}" Width="450"/>
+                <Button Content="选择" Command="{Binding ChooseLocalPathCommand}"/>
+            </WrapPanel>
+
+            <WrapPanel Margin="0 10 0 0">
+                <TextBlock Text="搜索样式" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                <TextBox Text="{Binding SearchPattern}" Width="200"/>
+            </WrapPanel>
+
+            <WrapPanel Margin="0 10 0 0">
+                <TextBlock Text="linux路径" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                <TextBox Text="{Binding RemotePath}" Width="200"/>
+
+            </WrapPanel>
+
+            <WrapPanel Margin="0 10 0 0">
+                <TextBlock Text="linux用主机" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                <TextBox Text="{Binding RemoteHost}" Width="200"/>
+            </WrapPanel>
+
+            <WrapPanel Margin="0 10 0 0">
+                <TextBlock Text="linux用户名" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                <TextBox Text="{Binding RemoteUserName}" Width="200"/>
+            </WrapPanel>
+
+            <WrapPanel Margin="0 10 0 0">
+                <TextBlock Text="linux密码" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                <TextBox Text="{Binding RemotePassword}" Width="200"/>
+                <Button Content="传输" Command="{Binding SendCommand}"/>
+                <Button Content="test" Command="{Binding TestCommand}" Margin="10 0 0 0"/>
+            </WrapPanel>
+
+
+            <WrapPanel Margin="0 20 0 0">
+                <RadioButton
+                    Content="dol"
+                    GroupName="aa"
+                    IsChecked="{Binding SelectedProduct,Converter={StaticResource productToBoolean},ConverterParameter={x:Static enumDto:ProductCode.Dol}}"
+                    Style="{StaticResource MaterialDesignLightRadioButton}"
+                    Command="{Binding ClickProductCommand}"
+                    CommandParameter="{x:Static enumDto:ProductCode.Dol}"
+                    />
+
+                <RadioButton
+                    Content="dol-test"
+                    GroupName="aa"
+                    IsChecked="{Binding SelectedProduct,Converter={StaticResource productToBoolean},ConverterParameter={x:Static enumDto:ProductCode.DolTest}}"
+                    Style="{StaticResource MaterialDesignLightRadioButton}"
+                    Command="{Binding ClickProductCommand}"
+                    CommandParameter="{x:Static enumDto:ProductCode.DolTest}"
+                    />
+
+                <RadioButton
+                    Content="陪诊"
+                    GroupName="aa"
+                    IsChecked="{Binding SelectedProduct,Converter={StaticResource productToBoolean},ConverterParameter={x:Static enumDto:ProductCode.陪诊}}"
+                    Style="{StaticResource MaterialDesignLightRadioButton}"
+                    Command="{Binding ClickProductCommand}"
+                    CommandParameter="{x:Static enumDto:ProductCode.陪诊}"
+                    />
+
+                <Button Content="保存配置" Margin="10 0 0 0" Command="{Binding SaveConfigCommand}" />
+            </WrapPanel>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

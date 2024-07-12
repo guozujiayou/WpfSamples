@@ -1,11 +1,6 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfPrismDemo.Domain;
 using WpfPrismDemo.Views;
@@ -43,11 +38,11 @@ namespace WpfPrismDemo.ViewModels
             });
 
             MenuItems = new ObservableCollection<MenuItemInfo>
-        {
-            //不绑定的话 直接在前端Text=&#xe614;  但是要绑定的话要改为下面这样
-            new MenuItemInfo("test","",typeof(TestView)),
-            new MenuItemInfo("test2","",typeof(Test2View)),
-        };
+            {
+                //不绑定的话 直接在前端Text=&#xe614;  但是要绑定的话要改为下面这样
+                new MenuItemInfo("scp上传","",typeof(ScpView)),
+                new MenuItemInfo("test2","",typeof(Test2View)),
+            };
 
             SelectedItem = MenuItems.FirstOrDefault();
         }
