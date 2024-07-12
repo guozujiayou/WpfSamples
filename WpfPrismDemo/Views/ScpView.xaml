@@ -19,8 +19,8 @@
         <StackPanel Margin="10">
             <WrapPanel>
                 <TextBlock Text="本地路径" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                <TextBox Text="{Binding LocalPath}" Width="450"/>
-                <Button Content="选择" Command="{Binding ChooseLocalPathCommand}"/>
+                <TextBox Text="{Binding LocalPath}" Width="450" VerticalAlignment="Center"/>
+                <Button Content="选择" Command="{Binding ChooseLocalPathCommand}"  />
             </WrapPanel>
 
             <WrapPanel Margin="0 10 0 0">
@@ -36,21 +36,26 @@
 
             <WrapPanel Margin="0 10 0 0">
                 <TextBlock Text="linux用主机" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                <TextBox Text="{Binding RemoteHost}" Width="200"/>
+                <TextBox Text="{Binding RemoteHost}" Width="200"  />
             </WrapPanel>
 
             <WrapPanel Margin="0 10 0 0">
                 <TextBlock Text="linux用户名" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                <TextBox Text="{Binding RemoteUserName}" Width="200"/>
+                <TextBox Text="{Binding RemoteUserName}" Width="200" />
             </WrapPanel>
 
             <WrapPanel Margin="0 10 0 0">
                 <TextBlock Text="linux密码" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                <TextBox Text="{Binding RemotePassword}" Width="200"/>
+                <TextBox Text="{Binding RemotePassword}" Width="200" VerticalAlignment="Center" />
                 <Button Content="传输" Command="{Binding SendCommand}"/>
                 <Button Content="test" Command="{Binding TestCommand}" Margin="10 0 0 0"/>
             </WrapPanel>
 
+            <WrapPanel Margin="0 10 0 0">
+                <TextBlock Text="执行命令" VerticalAlignment="Center" Margin="0 0 10 0" />
+                <TextBox Text="{Binding CommandText}" Width="200" VerticalAlignment="Center"/>
+                <Button Content="执行" Margin="10 0 0 0" Command="{Binding ExcuteCommand}" />
+            </WrapPanel>
 
             <WrapPanel Margin="0 20 0 0">
                 <RadioButton

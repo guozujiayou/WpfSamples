@@ -18,6 +18,7 @@ public class ScpViewModel : BindableBase
     public ICommand SendCommand { get; set; }
     public ICommand ClickProductCommand { get; set; }
     public ICommand SaveConfigCommand { get; set; }
+    public ICommand ExcuteCommand { get; set; }
     public ICommand TestCommand { get; set; }
 
     #endregion
@@ -74,6 +75,14 @@ public class ScpViewModel : BindableBase
         set { remotePassword = value; RaisePropertyChanged(); }
     }
 
+    private string? commandText;
+
+    public string? CommandText
+    {
+        get { return commandText; }
+        set { commandText = value; RaisePropertyChanged(); }
+    }
+
 
     private ProductCode selectedProduct;
 
@@ -99,6 +108,7 @@ public class ScpViewModel : BindableBase
         SendCommand = new DelegateCommand(() => _ = Send());
         SaveConfigCommand = new DelegateCommand(() => SaveConfig());
         TestCommand = new DelegateCommand(Test);
+        ExcuteCommand = new DelegateCommand(Excute);
 
         ClickProductCommand = new DelegateCommand<ProductCode?>((code) =>
         {
@@ -116,6 +126,31 @@ public class ScpViewModel : BindableBase
     {
         var a = 0;
         _ = 4 / a;
+    }
+
+    /// <summary>
+    /// 执行脚本
+    /// </summary>
+    private void Excute()
+    {
+        if (string.IsNullOrWhiteSpace(CommandText))
+        {
+            MessageBox.Show("请输入脚本");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(RemoteHost) || string.IsNullOrWhiteSpace(RemoteUserName) || string.IsNullOrWhiteSpace(RemotePassword))
+        {
+            MessageBox.Show("请填好Linux配置");
+            return;
+        }
+
+        using var client = new SshClient(RemoteHost, RemoteUserName, RemotePassword);
+
+        client.Connect();
+
+        using SshCommand cmd = client.RunCommand(CommandText);
+        Console.WriteLine(cmd.Result);
     }
 
     private void ChooseLocalPath()
@@ -189,6 +224,10 @@ public class ScpViewModel : BindableBase
         MessageBox.Show("保存成功");
     }
 
+    /// <summary>
+    /// scp上传文件
+    /// </summary>
+    /// <returns></returns>
     private async Task Send()
     {
         if (string.IsNullOrWhiteSpace(LocalPath) || !Directory.Exists(LocalPath))
@@ -223,7 +262,13 @@ public class ScpViewModel : BindableBase
             return;
         }
 
-        using var client = new SftpClient(RemoteHost!, RemoteUserName!, RemotePassword!);
+        if (string.IsNullOrWhiteSpace(RemoteHost) || string.IsNullOrWhiteSpace(RemoteUserName) || string.IsNullOrWhiteSpace(RemotePassword))
+        {
+            MessageBox.Show("请填好Linux配置");
+            return;
+        }
+
+        using var client = new SftpClient(RemoteHost, RemoteUserName, RemotePassword);
         await client.ConnectAsync(CancellationToken.None);
 
         //目前只发布api文件，都在单个文件夹内
@@ -265,6 +310,14 @@ public class ScpViewModel : BindableBase
                 RemoteUserName = selectedConfig?.RemoteUserName;
                 RemotePassword = selectedConfig?.RemotePassword;
                 SearchPattern = selectedConfig?.SearchPattern;
+
+                CommandText = SelectedProduct switch
+                {
+                    ProductCode.Dol => "systemctl restart dolapi",
+                    ProductCode.DolTest => "systemctl restart apitest",
+                    ProductCode.陪诊 => "systemctl restart pzapi",
+                    _ => string.Empty
+                };
             }
         }
     }

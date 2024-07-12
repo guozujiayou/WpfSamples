@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
 
 namespace WpfPrismDemo
 {
@@ -29,7 +27,7 @@ namespace WpfPrismDemo
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            MessageBox.Show("所有线程中的异常：" + (e.ExceptionObject as Exception).Message);
+            MessageBox.Show("所有线程中的异常：" + (e.ExceptionObject as Exception)?.Message);
             Console.WriteLine("程序即将终止...");
         }
 
