@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Mvvm;
 using Renci.SshNet;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -19,6 +20,7 @@ public class ScpViewModel : BindableBase
     public ICommand ClickProductCommand { get; set; }
     public ICommand SaveConfigCommand { get; set; }
     public ICommand ExcuteCommand { get; set; }
+    public ICommand ClearMessageCommand { get; set; }
     public ICommand TestCommand { get; set; }
 
     #endregion
@@ -92,6 +94,14 @@ public class ScpViewModel : BindableBase
         set { selectedProduct = value; RaisePropertyChanged(); }
     }
 
+    private string? message;
+
+    public string? Message
+    {
+        get { return message; }
+        set { message = value; RaisePropertyChanged(); }
+    }
+
 
     #endregion
 
@@ -118,14 +128,25 @@ public class ScpViewModel : BindableBase
                 LoadConfig();
             }
         });
-
+        ClearMessageCommand = new DelegateCommand(() => Message = string.Empty);
         LoadConfig();
     }
 
     private void Test()
     {
+        var dd = AppDomain.CurrentDomain.BaseDirectory;
         var a = 0;
         _ = 4 / a;
+    }
+
+    private void AppendMessage(string msg)
+    {
+        if (string.IsNullOrEmpty(Message))
+            Message = msg;
+        else
+        {
+            Message += Environment.NewLine + msg;
+        }
     }
 
     /// <summary>
@@ -147,10 +168,25 @@ public class ScpViewModel : BindableBase
 
         using var client = new SshClient(RemoteHost, RemoteUserName, RemotePassword);
 
-        client.Connect();
+        try
+        {
+            client.Connect();
 
-        using SshCommand cmd = client.RunCommand(CommandText);
-        Console.WriteLine(cmd.Result);
+            //若要在一个回话执行多个命令用CreateCommand
+            using SshCommand cmd = client.RunCommand(CommandText);
+
+            Debug.WriteLine(cmd.Result);
+            AppendMessage($"脚本执行结果：{cmd.Result}");
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show(e.Message);
+        }
+        finally
+        {
+            client.Disconnect();
+        }
+        
     }
 
     private void ChooseLocalPath()
@@ -277,17 +313,45 @@ public class ScpViewModel : BindableBase
             client.CreateDirectory(RemotePath);
         }
 
-        files.ForEach(file =>
+        async Task UploadFile(string file)
         {
-            using (var inputStream = new FileStream(file, FileMode.Open))
-            {
-                //在Windows上操作，用Path.Combine生成的斜杆和Linux上反过来
-                client.UploadFile(inputStream, RemotePath + Path.GetFileName(file));
-            }
-        });
+            using var inputStream = new FileStream(file, FileMode.Open);
 
-        client.Disconnect();
-        MessageBox.Show("上传成功");
+            //在Windows上操作，用Path.Combine生成的斜杆和Linux上反过来
+            var destPath = RemotePath + Path.GetFileName(file);
+
+            //异步（APM异步编程模型，已过时）
+            var asyncResult = client.BeginUploadFile(inputStream, destPath);
+
+            //APM转换为TAP
+            await Task.Factory.FromAsync(asyncResult, client.EndUploadFile);
+            AppendMessage($"{DateTime.Now.ToLocalTime()} {file}上传完了");
+            Debug.WriteLine($"{DateTime.Now.ToLocalTime()} {file}上传完了");
+        }
+
+        try
+        {
+            List<Task> uploadTasks = new();
+            AppendMessage($"{files.Count}个文件待上传");
+            Debug.WriteLine($"{files.Count}个文件待上传");
+            foreach (var file in files)
+            {
+                uploadTasks.Add(UploadFile(file));
+            }
+
+            await Task.WhenAll(uploadTasks);
+            Debug.WriteLine($"{DateTime.Now.ToLocalTime()} 上传成功");
+            AppendMessage($"{DateTime.Now.ToLocalTime()} 上传成功");
+            //MessageBox.Show($"{DateTime.Now.ToLocalTime()} 上传成功");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        finally
+        {
+            client.Disconnect();
+        }
     }
 
     /// <summary>

@@ -16,6 +16,7 @@
     </UserControl.Resources>
 
     <Grid>
+
         <StackPanel Margin="10">
             <WrapPanel>
                 <TextBlock Text="本地路径" VerticalAlignment="Center" Margin="0 0 10 0"/>
@@ -87,6 +88,25 @@
 
                 <Button Content="保存配置" Margin="10 0 0 0" Command="{Binding SaveConfigCommand}" />
             </WrapPanel>
+        </StackPanel>
+
+        <StackPanel HorizontalAlignment="Right" Margin="0 80 10 0" Width="300" Height="300">
+            <WrapPanel>
+                <TextBlock Text="输出" VerticalAlignment="Center"/>
+                <Button Content="清空" Command="{Binding ClearMessageCommand}" VerticalAlignment="Center" Margin="10 0 0 0" />
+            </WrapPanel>
+
+            <TextBox
+                Text="{Binding Message}"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                AcceptsReturn="True"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                MaxHeight="200"
+                Height="200"
+                VerticalScrollBarVisibility="Auto"
+                TextWrapping="Wrap"
+                Margin="5" />
         </StackPanel>
 
     </Grid>
