@@ -24,5 +24,13 @@ namespace WpfPrismDemo.Views
         {
             InitializeComponent();
         }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                textBox.ScrollToEnd();
+            }
+        }
     }
 }
